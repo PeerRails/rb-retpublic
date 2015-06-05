@@ -11,9 +11,9 @@ class Jobs < DB
     return "/tmp/files/#{url.split("/").last}"
   end
 
-  def self.download
+  def download
     self.where(done: false).get.each do |job|
-      self.update(job["id"], downloaded: download_file(job["img_url"], "/tmp/files") ) if job["downloaded"].nil?
+      self.update(job["id"], downloaded: "\'#{download_file(job["img_url"], "/tmp/files")}\'" ) if job["downloaded"].nil? || job["downloaded"] == ''
     end
   end
 

@@ -11,6 +11,6 @@ end
 
 db = Jobs.new
 
-db.where(done: false).get.each do |job|
-  db.update(job["id"], downloaded: "\'#{download_file(job["img_url"], "/tmp/files")}\'" ) if job["downloaded"].nil? || job["downloaded"] == ''
-end
+#db.download
+record = db.where(img_url: "'als'").get.last
+p record.present?
