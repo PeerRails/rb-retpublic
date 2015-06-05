@@ -11,6 +11,4 @@ end
 
 db = Jobs.new
 
-#db.download
-record = db.where(img_url: "'als'").get.last
-p record.present?
+db.download
