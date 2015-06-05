@@ -28,5 +28,6 @@ end
  done bool def: false
  img_url string not null unique
  downloaded string null unique
+ tweet_id string null unique
 
 =end

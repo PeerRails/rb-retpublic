@@ -110,6 +110,14 @@ class DB
   	end
   end
 
+  def first
+  	if @rows.nil? || @rows.empty?
+  	  self.limit(1).get.rows
+  	else
+  	  @rows.first
+  	end
+  end
+
   def all
   	@rows
   end
