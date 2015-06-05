@@ -1,12 +1,12 @@
-require "./db"
+require "./job_model"
 require 'date'
 require 'vkontakte_api'
-
-db = Jobs.new('postgres://donergirl:123456@localhost/dg_jobs')
+#postgres://donergirl:123456@localhost/dg_jobs
+db = Jobs.new
 app = VkontakteApi::Client.new
-wall = app.wall.get(domain: 'donergirls', count: 100)
+wall = app.wall.get(domain: 'donergirls', count: 150)
 wall = wall.drop(1)
-p wall.count
+
 wall.each do |post|
   begin
     db.create(date: "to_timestamp(#{post[:date]})", done: false, img_url: "\'#{post[:attachment][:photo][:src_xxbig]}\'") unless post[:attachment][:photo][:src_xxbig].nil?
@@ -15,3 +15,4 @@ wall.each do |post|
     p post.to_json
   end
 end
+p wall.count

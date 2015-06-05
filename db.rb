@@ -1,11 +1,10 @@
 require "pg"
 
-class Jobs
-  attr_accessor :rows
+class DB
 
-  def initialize(con)
-    @conn = PG.connect(con)
-    @tablename = "jobs"
+  def initialize
+  	@conn = PG.connect(ENV["DB_URL"])
+    @tablename = self.class.name.downcase
   end
 
   def self.before(*names)
@@ -18,11 +17,13 @@ class Jobs
     end
   end
 
-  def exec(q)
-    @rows = []
-    @conn.exec(q).each do |res|
-      @rows.push res
-    end
+  def run_query
+  	unless @query.nil?
+	    @rows = []
+	    @conn.exec(@query).each do |res|
+	      @rows.push res
+	    end
+	end
   end
 
   def query_builder(args)
@@ -35,13 +36,17 @@ class Jobs
       count -= 1
     end
     @query += " LIMIT #{conditions[:limit]}" unless conditions[:limit].nil?
-    return @query
+    p @query
+    run_query
   end
 
   def get
     query_builder("SELECT * FROM #{@tablename}")
-    exec @query
     self
+  end
+
+  def each(&block)
+  	@rows.each(&block)
   end
 
   def clean
@@ -65,23 +70,18 @@ class Jobs
       end
     end
     query_builder("INSERT INTO #{@tablename} (#{columns}) VALUES(#{values})")
-    exec @query
   end
 
   def update(id, args)
     count = args.nil? ? 1 : args.count
     q = ""
     args.each do |k, v|
-      q += " #{k} = #{v} "
+      q += " #{k}=#{v} " if count > 0
       q += "," if count > 1
       count -= 1
     end
-    query_builder = "UPDATE #{@tablename} SET (#{q})"
-    exec @query
-  end
-
-  def update_job(id)
-    @conn.exec("UPDATE jobs SET done = true WHERE id = #{id}")
+    conditions[:conditions] = {id: id}
+    query_builder "UPDATE #{@tablename} SET #{q}"
   end
 
   def rows
@@ -103,12 +103,21 @@ class Jobs
   end
 
   def last
-    @rows.last
+  	if @rows.nil? || @rows.empty?
+  	  self.limit(1).get.rows
+  	else
+  	  @rows.last
+  	end
   end
 
   def all
   	@rows
   end
 
+  def count
+  	@rows.count
+  end
+
+  #protected :clean, :query_builder, :query, :exec
   before("where", "create", "update") { @clean }
 end
