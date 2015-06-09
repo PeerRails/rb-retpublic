@@ -19,7 +19,7 @@ class Jobs < DB
     self.where(done: false).get.each do |job|
       update_job  = Jobs.new
       download_path = download_file(job["img_url"], "/var/www/files")
-      update_job.update(job["id"], downloaded: "\'#{download_path}\'" ) if job["downloaded"].nil? || job["downloaded"] == '' || download_path.nil? || download_path != ''
+      update_job.update(job["id"], downloaded: "\'#{download_path}\'" ) if job["downloaded"].nil? || job["downloaded"] == '' || !download_path.nil? || download_path != ''
     end
   end
 
