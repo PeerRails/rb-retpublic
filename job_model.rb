@@ -4,16 +4,19 @@ require "open-uri"
 class Jobs < DB
 
   def download_file(url, path)
-    File.open("#{path}/#{url.split("/").last}", 'wb') do |fo|
-      fo.write open(url).read 
-      p "downloaded #{url.split("/").last}"
+    unless url == ""
+      File.open("#{path}/#{url.split("/").last}", 'wb') do |fo|
+        fo.write open(url).read 
+        p "downloaded #{path}/#{url.split("/").last}"
+      end
+      return "#{path}/#{url.split("/").last}"
     end
-    return "/tmp/files/#{url.split("/").last}"
   end
 
   def download
     self.where(done: false).get.each do |job|
-      self.update(job["id"], downloaded: "\'#{download_file(job["img_url"], "/tmp/files")}\'" ) if job["downloaded"].nil? || job["downloaded"] == ''
+      update_job  = Jobs.new
+      update_job.update(job["id"], downloaded: "\'#{download_file(job["img_url"], "/var/www/files")}\'" ) if job["downloaded"].nil? || job["downloaded"] == ''
     end
   end
 

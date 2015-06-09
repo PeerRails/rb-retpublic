@@ -11,10 +11,12 @@ module Tweet
 
   def tweet
     last_job = Jobs.new
-    update_job = Jobs.new
     last_job = last_job.where(done: false).get.last
-    tweet_id = client.update_with_media("# #{last_job["id"]}", open(last_job["downloaded"]), {lat: 42.041667, long: -71.841667, place_id: "96683cc9126741d1"} )
-    update_job.update(last_job["id"], done: true, tweet_id: "\'#{tweet_id[:id]}\'")
+    unless last_job["downloaded"].nil? || last_job["downloaded"] == ''
+      tweet_id = client.update_with_media("", open(last_job["downloaded"]), {lat: 42.041667, long: -71.841667, place_id: "96683cc9126741d1"} )
+      update_job = Jobs.new
+      update_job.update(last_job["id"], done: true, tweet_id: "\'#{tweet_id[:id]}\'")
+    end
   end
 
 end

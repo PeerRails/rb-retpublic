@@ -3,7 +3,7 @@ require "pg"
 class DB
 
   def initialize
-  	@conn = PG.connect(ENV["DB_URL"])
+    @db_url = ENV["DB_URL"]
     @tablename = self.class.name.downcase
   end
 
@@ -18,11 +18,14 @@ class DB
   end
 
   def run_query
+    @conn = PG.connect(@db_url)
   	unless @query.nil?
 	    @rows = []
 	    @conn.exec(@query).each do |res|
 	      @rows.push res
 	    end
+      @conn.finish
+      @clean
 	end
   end
 
@@ -127,5 +130,5 @@ class DB
   end
 
   #protected :clean, :query_builder, :query, :exec
-  before("where", "create", "update") { @clean }
+  #before("where", "create", "update") { @clean }
 end
