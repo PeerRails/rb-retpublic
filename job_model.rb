@@ -4,7 +4,7 @@ require "open-uri"
 class Jobs < DB
 
   def download_file(url, path)
-    unless url == ""
+    if url != ""
       File.open("#{path}/#{url.split("/").last}", 'wb') do |fo|
         fo.write open(url).read 
         p "downloaded #{path}/#{url.split("/").last}"
